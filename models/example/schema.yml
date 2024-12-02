@@ -1,0 +1,312 @@
+version: 2
+
+models:
+  - name: quotes_features
+    config:
+      elementary:
+        timestamp_column: "loaded_at"
+    tests:
+      - elementary.volume_anomalies:
+          detection_period:
+            period: day
+            count: 1
+          tags: ["elementary"]
+          anomaly_sensitivity: 2
+          seasonality: day_of_week
+      - elementary.dimension_anomalies:
+          dimensions:
+            - product
+          time_bucket:
+            period: day
+            count: 2
+          tags: ["elementary"]
+          anomaly_sensitivity: 1
+          seasonality: day_of_week
+      - elementary.all_columns_anomalies:
+          dimensions:
+            - product
+          time_bucket:
+            period: day
+            count: 1
+          tags: ["elementary"]
+          anomaly_sensitivity: 2
+          seasonality: day_of_week
+    columns:
+      - name: quote_id
+        tests:
+          - unique
+          - not_null
+      - name: insured_person_age
+        tests:
+          - percentile:
+              min_value: 37
+              max_value: 74
+          - dbt_expectations.expect_column_stdev_to_be_between:
+              min_value: 21 
+              max_value: 29
+              group_by: [product]
+              strictly: false
+
+  - name: kolmogorov_smirnov_statistic
+    description: "Compute K-S statistic for INSURED_PERSON_AGE comparing ECDF with Theoretical CDF."
+    columns:
+      - name: ks_statistic
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 0
+              max_value: 0.3
+
+  # - name: reporting_subject_type_distribution_stats
+  #   description: "Aggregated distribution statistics for reporting subject types over time."
+  #   columns:
+  #     - name: avg_premium
+  #       tests:
+  #         - not_null
+  #         - accepted_range:
+  #             min_value: 100
+  #             max_value: 4000
+  #     - name: stddev_premium
+  #       tests:
+  #         - not_null
+  #     - name: diesel_count
+  #       tests:
+  #         - not_null
+  #         - accepted_range:
+  #             min_value: 0
+  #             max_value: 1000
+  #     - name: petrol_count
+  #       tests:
+  #         - not_null
+  #         - accepted_range:
+  #             min_value: 0
+  #             max_value: 1000
+  #     - name: avg_claim_count
+  #       tests:
+  #         - not_null
+  #         - accepted_range:
+  #             min_value: 0
+  #             max_value: 5
+  #     - name: avg_insured_age
+  #       tests:
+  #         - not_null
+  #         - accepted_range:
+  #             min_value: 18
+  #             max_value: 80
+
+
+
+
+  # - name: quotes_features_bvi
+  #   config:
+  #     elementary:
+  #       timestamp_column: "loaded_at"
+  #   tests:
+  #     - elementary.volume_anomalies:
+  #         detection_period:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #     - elementary.all_columns_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #   columns:
+  #     - name: quote_id
+  #       tests:
+  #         - unique
+  #         - not_null
+
+  # - name: quotes_features_car
+  #   config:
+  #     elementary:
+  #       timestamp_column: "loaded_at"
+  #   tests:
+  #     - elementary.volume_anomalies:
+  #         detection_period:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #     - elementary.all_columns_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #   columns:
+  #     - name: quote_id
+  #       tests:
+  #         - unique
+  #         - not_null
+
+  # - name: quotes_features_courier
+  #   config:
+  #     elementary:
+  #       timestamp_column: "loaded_at"
+  #   tests:
+  #     - elementary.volume_anomalies:
+  #         detection_period:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #     - elementary.all_columns_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #   columns:
+  #     - name: quote_id
+  #       tests:
+  #         - unique
+  #         - not_null
+
+  - name: quotes_features_pci
+    config:
+      elementary:
+        timestamp_column: "loaded_at"
+    tests:
+      - elementary.volume_anomalies:
+          detection_period:
+            period: day
+            count: 1
+          tags: ["elementary"]
+          anomaly_sensitivity: 2
+          seasonality: day_of_week
+      - elementary.all_columns_anomalies:
+          dimensions:
+            - product
+          time_bucket:
+            period: day
+            count: 1
+          tags: ["elementary"]
+          anomaly_sensitivity: 2
+          seasonality: day_of_week
+      - elementary.dimension_anomalies:
+          dimensions:
+            - product
+          time_bucket:
+            period: day
+            count: 1
+          tags: ["elementary"]
+          anomaly_sensitivity: 1
+          seasonality: day_of_week
+    columns:
+      - name: quote_id
+        tests:
+          - unique
+          - not_null
+      - name: insured_person_age
+        tests:
+          - dbt_expectations.expect_column_stdev_to_be_between:
+              min_value: 21 
+              max_value: 29
+              group_by: [product]
+              strictly: false
+
+  # - name: quotes_features_pvi
+  #   config:
+  #     elementary:
+  #       timestamp_column: "loaded_at"
+  #   tests:
+  #     - elementary.dimension_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 7
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 1.5
+  #         seasonality: day_of_week
+  #     - elementary.volume_anomalies:
+  #         detection_period:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #     - elementary.all_columns_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #   columns:
+  #     - name: quote_id
+  #       tests:
+  #         - unique
+  #         - not_null
+
+  # - name: quotes_features_scooter
+  #   config:
+  #     elementary:
+  #       timestamp_column: "loaded_at"
+  #   tests:
+  #     - elementary.volume_anomalies:
+  #         detection_period:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #     - elementary.all_columns_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #   columns:
+  #     - name: quote_id
+  #       tests:
+  #         - unique
+  #         - not_null
+
+  # - name: quotes_features_taxi
+  #   config:
+  #     elementary:
+  #       timestamp_column: "loaded_at"
+  #   tests:
+  #     - elementary.volume_anomalies:
+  #         detection_period:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #     - elementary.all_columns_anomalies:
+  #         dimensions:
+  #           - product
+  #         time_bucket:
+  #           period: day
+  #           count: 1
+  #         tags: ["elementary"]
+  #         anomaly_sensitivity: 2
+  #         seasonality: day_of_week
+  #   columns:
+  #     - name: quote_id
+  #       tests:
+  #         - unique
+  #         - not_null
