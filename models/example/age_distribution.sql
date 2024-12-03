@@ -20,53 +20,39 @@ product_percentile as (
     group by product, loaded_at
 )
 
--- , distribution as (
---     select
---         *, 
---         s.product as s_p,
---         s.loaded_at as s_l,
---         -- make dynamic
---         case 
---             when s.product = pp.products and s.loaded_at = pp.loaded_ats and s.insured_person_age < pp.percentile_25 then 1
---             when s.product = pp.products and s.loaded_at = pp.loaded_ats and s.insured_person_age between pp.percentile_25 and percentile_50 then 2
---             when s.product = pp.products and s.loaded_at = pp.loaded_ats and s.insured_person_age between pp.percentile_50 and percentile_75 then 3
---             when s.product = pp.products and s.loaded_at = pp.loaded_ats and s.insured_person_age > percentile_75 then 4
---             else null
---         end as dist
---     from source as s
---     left join product_percentile as pp on s.product = pp.products and s.loaded_at = pp.loaded_ats
--- )
-
--- , count_window as (
---     select distinct
---         product,
---         loaded_at,
---         dist,
---         -- make dynamic
---         count(*) over (partition by product, loaded_at, dist ) as count_win,
---         count(*) over (partition by product, loaded_at) as count_win_total
---     from distribution
--- )
-
--- , count_win_perc as (
---     select
---         product,
---         loaded_at,
---         dist,
---         -- insured_person_age,
---         -- make dynamic
---         case 
---             when dist = 1 then 'percentile_25'
---             when dist = 2 then 'percentile_25_50'
---             when dist = 3 then 'percentile_50_75'
---             when dist = 4 then 'percentile_75'
---             else null
---         end as percentile_position,
---         100 * (count_win / count_win_total) as perc
---     from count_window
--- )
+, rolling_avg as (
+    select
+        product,
+        loaded_at,
+        avg(p_min) over (
+              partition by product 
+              order by loaded_at 
+             RANGE BETWEEN INTERVAL '10 DAYS' preceding and current row
+            ) as percentile_min_avg,
+        avg(percentile_25) OVER (
+              partition by product 
+              order by loaded_at 
+             RANGE BETWEEN INTERVAL '10 DAYS' preceding and current row
+            ) as percentile_25_avg,
+        avg(percentile_50) OVER (
+              partition by product 
+              order by loaded_at 
+             RANGE BETWEEN INTERVAL '10 DAYS' preceding and current row
+            ) as percentile_50_avg,
+        avg(percentile_75) OVER (
+              partition by product 
+              order by loaded_at 
+             RANGE BETWEEN INTERVAL '10 DAYS' preceding and current row
+            ) as percentile_75_avg,
+        avg(p_max) OVER (
+              partition by product 
+              order by loaded_at 
+             RANGE BETWEEN INTERVAL '10 DAYS' preceding and current row
+            ) as percentile_max_avg,
+    from product_percentile
+)
 
 select * from 
-
-product_percentile --where products = 'bvi' order by 2
+rolling_avg
+-- product_percentile --where products = 'bvi' order by 2
 -- count_win_perc
