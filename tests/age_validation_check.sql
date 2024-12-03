@@ -1,5 +1,5 @@
 with source as (
-    select * from {{ ref('age_distribution') }} 
+    select * from {{ ref('age_distribution_rolling') }} 
 )
 
 -- , fuel_source as (
@@ -39,7 +39,8 @@ with source as (
 
 
 select * from 
--- t_0
 variance_check
--- where 
---     abs(percentage_diff) > 10 or abs(percentage_diff_fuel) > 10
+where 
+    abs(variance_value_min) > 10 or abs(variance_value_percentile_25) > 10
+    or abs(variance_value_percentile_50) > 10 or abs(variance_value_percentile_75) > 10
+    or abs(variance_value_max) > 10 
