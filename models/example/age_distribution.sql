@@ -1,3 +1,5 @@
+{{ config(materialized='table') }}
+
 with source as (
     select * from {{ ref('quotes_features') }} 
     where loaded_at is not null
@@ -7,12 +9,13 @@ product_percentile as (
     select
         product as products,
         loaded_at as loaded_ats,
+        -- insured_person_age,
         -- make dynamic
         approx_percentile(insured_person_age, 0.25) as percentile_25, 
         approx_percentile(insured_person_age, 0.5) as percentile_50,
         approx_percentile(insured_person_age, 0.75) as percentile_75
     from source
-    group by products, loaded_ats
+    group by products, loaded_ats --, insured_person_age
 )
 
 , distribution as (
@@ -61,4 +64,7 @@ product_percentile as (
     from count_window
 )
 
-select * from count_win_perc
+select * from 
+
+product_percentile where products = 'bvi' order by 2
+-- count_win_perc
