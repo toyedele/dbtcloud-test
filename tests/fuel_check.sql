@@ -37,7 +37,7 @@ with source as (
         t_0.product,
         t_0.loaded_at,
         t_0.fuel_type,
-        100 *(round((t_7.rolling_10_day_count - t_0.rolling_10_day_count)/t_7.rolling_10_day_count ,0)) as variance_value_fuel
+        100 *(round((t_7.rolling_10_day_fuel_count - t_0.rolling_10_day_fuel_count)/t_7.rolling_10_day_fuel_count ,0)) as variance_value_fuel
     from t_0_fuel as t_0
     left join t_7_fuel as t_7 on t_0.product = t_7.product and t_0.fuel_type = t_7.fuel_type
 )
