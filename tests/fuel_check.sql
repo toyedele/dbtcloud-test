@@ -36,27 +36,15 @@ with source as (
     select
         t_0.product,
         t_0.loaded_at,
-        t_0.fuel_type,
-        100 *(round((t_7.rolling_10_day_fuel_count - t_0.rolling_10_day_fuel_count)/t_7.rolling_10_day_fuel_count ,0)) as variance_value_fuel
+        'fuel_type' as feature,
+        t_0.fuel_type as measure,
+        100 *(round((t_7.rolling_10_day_fuel_count - t_0.rolling_10_day_fuel_count)/t_7.rolling_10_day_fuel_count ,0)) as percent_diff
     from t_0_fuel as t_0
     left join t_7_fuel as t_7 on t_0.product = t_7.product and t_0.fuel_type = t_7.fuel_type
 )
 
--- , final as (
---    select distinct
---         v.product,
---         v.loaded_at,
---         v.percentile_position,
---         v.variance_value as percentage_diff,
---         vf.fuel_type,
---         vf.variance_value_fuel as percentage_diff_fuel
---     from variance_check as v
---     left join variance_check_fuel as vf 
---         on v.product = vf.product 
---         and v.loaded_at = vf.loaded_at
--- )
 
 select * from 
 -- final
 variance_check_fuel
-where abs(variance_value_fuel) > 10 --or abs(percentage_diff_fuel) > 10
+-- where abs(variance_value_fuel) > 10 --or abs(percentage_diff_fuel) > 10

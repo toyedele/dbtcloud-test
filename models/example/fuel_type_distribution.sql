@@ -9,7 +9,7 @@ with source as (
     select distinct
         product,
         loaded_at,
-        fuel_type,
+        fuel_type, -- name
         count(*) over (partition by product, fuel_type
                         ORDER BY loaded_at
                         RANGE BETWEEN INTERVAL '10 DAYS' PRECEDING AND CURRENT ROW 

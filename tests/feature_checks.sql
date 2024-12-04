@@ -61,4 +61,4 @@ with source as (
 
 select * from 
 final
-where abs(percent_diff) > 10
+-- where abs(percent_diff) > 10

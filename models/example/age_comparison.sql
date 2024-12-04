@@ -2,6 +2,7 @@
 
 with source as (
     select * from {{ ref('quotes_features') }} 
+    where loaded_at is not null
 )
 
 , rolling_window as (
@@ -58,12 +59,7 @@ rolling_percentile as (
         d.daily_percentile_25, 
         d.daily_percentile_50,
         d.daily_percentile_75,
-        d.daily_p_max,
-        round(100 * ((r.rolling_p_min -  d.daily_p_min) / r.rolling_p_min),0)  as ratio_p_min,
-        round(100 * ((r.rolling_percentile_25 - d.daily_percentile_25) / r.rolling_percentile_25),0) as ratio_percentile_25,
-        round(100 * ((r.rolling_percentile_50 - d.daily_percentile_50) / r.rolling_percentile_50),0) as ratio_p_median,
-        round(100 * ((r.rolling_percentile_75 - d.daily_percentile_75) / r.rolling_percentile_75),0) as ratio_percentile_25,
-        round(100 * ((r.rolling_p_max - d.daily_p_max) / r.rolling_p_max),0) as ratio_p_max
+        d.daily_p_max
     from rolling_percentile as r
     left join daily_percentile as d
         on r.product = d.product
@@ -72,4 +68,6 @@ rolling_percentile as (
 )
 
 select * from 
-final 
+final
+-- product_percentile --where products = 'bvi' order by 2
+-- count_win_perc
